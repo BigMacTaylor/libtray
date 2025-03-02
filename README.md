@@ -1,6 +1,8 @@
 # libtray
 
-Nim wrapper for [tray](https://github.com/dmikushin/tray/tree/master).
+Added status function to tooltip.
+
+Nim wrapper for [tray](https://github.com/dmikushin/tray/tree/master) by neroist.
 
 Examples are available at [`examples/`](examples/).
 
