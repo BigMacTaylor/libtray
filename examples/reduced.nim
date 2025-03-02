@@ -57,11 +57,11 @@ proc submenu_cb(item: ptr TrayMenuItem) {.cdecl.} =
   echo "submenu: clicked on ", item.text
 
 # Set custom command to get info
-let Cmd = "echo This text auto updates"
+let Cmd = "date \"+%T\""  #This text auto updates
 
 let tray = initTray(
   iconFilepath = icon1,
-  tooltip = "Label: ",
+  tooltip = "Time: ",
   tooltipCmd = Cmd,
   cb = window_cb,
   menus = [
