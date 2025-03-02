@@ -16,7 +16,7 @@ class QtTrayMenu : public QObject
                 virtual bool eventFilter(QObject *watched, QEvent *event) override;
                 int init(struct tray *tray);
                 void update(struct tray *tray);
-                int loop(int blocking);
+                int loop(int blocking, struct tray *tray);
                 void exit();
 
             private:
@@ -26,6 +26,7 @@ class QtTrayMenu : public QObject
                 QApplication *app;
                 QSystemTrayIcon *trayIcon;
                 struct tray *trayStruct;
+                QString toolTip(struct tray *tray);
                 bool continueRunning;
                 struct tray_menu_item *getTrayMenuItem(QAction *action);
 

@@ -1,6 +1,9 @@
 #include "QtTrayMenu.h"
 #include <QApplication>
 #include "main.moc"
+#include <QTimer>
+#include <QProcess>
+//#include <QDebug>
 
 int argc = 1;
 char *argvArray[] = {(char*)"TrayMenuApp", nullptr};
@@ -48,7 +51,7 @@ int QtTrayMenu::init(struct tray *tray)
         app->setApplicationName(tray->tooltip);
 
     trayIcon = new QSystemTrayIcon(QIcon(tray->icon_filepath));
-    trayIcon->setToolTip(QString::fromUtf8(tray->tooltip));
+    trayIcon->setToolTip(toolTip(tray));
 
     connect(trayIcon, &QSystemTrayIcon::activated, this, &QtTrayMenu::onTrayActivated);
     connect(this, &QtTrayMenu::exitRequested, this, &QtTrayMenu::onExitRequested);
@@ -69,7 +72,7 @@ void QtTrayMenu::update(struct tray *tray)
         auto newIcon = QIcon(tray->icon_filepath);
         if (!newIcon.isNull())
             trayIcon->setIcon(newIcon);
-        trayIcon->setToolTip(QString::fromUtf8(tray->tooltip));
+        trayIcon->setToolTip(toolTip(tray));
     }
 
     auto *existingMenu = trayIcon->contextMenu();
@@ -79,7 +82,28 @@ void QtTrayMenu::update(struct tray *tray)
     }
 }
 
-int QtTrayMenu::loop(int blocking)
+QString QtTrayMenu::toolTip(struct tray *tray)
+{
+    QString text = QString::fromUtf8(tray->tooltip);
+    QString cmd = QString::fromUtf8(tray->tooltipCmd);
+    QString program = "/bin/sh";
+    QStringList arguments;
+    arguments << "-c" << cmd;
+
+    QProcess process;
+    process.start(program, arguments);
+    process.waitForFinished();
+
+    QString output(process.readAllStandardOutput());
+    output = output.trimmed();
+    //qDebug() << "Output:" << output;
+
+    QString toolTip = text + output;
+
+    return toolTip;
+}
+
+int QtTrayMenu::loop(int blocking, struct tray *tray)
 {
     if (!continueRunning) {
         return -1;
@@ -90,6 +114,12 @@ int QtTrayMenu::loop(int blocking)
     }
     if (blocking)
     {
+        QTimer *timer = new QTimer();
+        QObject::connect(timer, &QTimer::timeout, [&]() {
+            trayIcon->setToolTip(toolTip(tray));
+        });
+        timer->start(1000); // Update every 1000 ms (1 second)
+
         app->exec();
         return -1;
     }

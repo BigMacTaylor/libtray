@@ -23,6 +23,7 @@ extern "C"
 struct tray {
   const char *icon_filepath;
   const char *tooltip;
+  const char *tooltipCmd;
   void (*cb)(struct tray *); // called on left click, leave null to just open menu
   struct tray_menu_item *menu;
 };
@@ -42,10 +43,13 @@ TRAY_EXPORT
 int tray_init(struct tray *tray);
 
 TRAY_EXPORT
-int tray_loop(int blocking);
+int tray_loop(int blocking, struct tray *tray);
 
 TRAY_EXPORT
 void tray_update(struct tray *tray);
+
+TRAY_EXPORT
+QString tray_toolTip(struct tray *tray);
 
 TRAY_EXPORT
 void tray_exit(void);

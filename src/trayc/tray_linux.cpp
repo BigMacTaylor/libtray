@@ -25,8 +25,14 @@ TRAY_EXPORT int tray_init(struct tray *tray)
     return trayMenuInstance->init(tray);
 }
 
-TRAY_EXPORT int tray_loop(int blocking) {
-    return trayMenuInstance ? trayMenuInstance->loop(blocking) : -1;
+TRAY_EXPORT int tray_loop(int blocking, struct tray *tray)
+{
+    currentTrayStruct = tray;
+    if (trayMenuInstance)
+    {
+        trayMenuInstance->update(tray);
+    }
+    return trayMenuInstance ? trayMenuInstance->loop(blocking, tray) : -1;
 }
 
 TRAY_EXPORT void tray_update(struct tray *tray)
@@ -36,6 +42,15 @@ TRAY_EXPORT void tray_update(struct tray *tray)
     {
         trayMenuInstance->update(tray);
     }
+}
+
+TRAY_EXPORT QString tray_toolTip(struct tray *tray)
+{
+    currentTrayStruct = tray;
+    if (trayMenuInstance)
+    {
+        trayMenuInstance->update(tray);
+    }  
 }
 
 TRAY_EXPORT void tray_exit(void)

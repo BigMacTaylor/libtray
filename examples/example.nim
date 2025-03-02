@@ -54,9 +54,13 @@ proc quit_cb(_: ptr TrayMenuItem) {.cdecl.} =
 proc submenu_cb(item: ptr TrayMenuItem) {.cdecl.} =
   echo "submenu: clicked on ", item.text
 
+# Set custom command to get info
+let Cmd = "echo This text auto updates"
+
 let tray = initTray(
   iconFilepath = icon1,
-  tooltip = "Tray",
+  tooltip = "Label: ",
+  tooltipCmd = Cmd,
   cb = window_cb,
   menus = [
     initTrayMenuItem(text = "Change Icon", cb = hello_cb),
@@ -100,7 +104,7 @@ if trayInit(addr tray) != 0:
 
 const blocking = 1
 
-while trayLoop(blocking) == 0:
+while trayLoop(blocking, addr tray) == 0:
   if blocking != 1:
     sleep 100
 

@@ -41,6 +41,7 @@ type
   Tray* {.bycopy.} = object
     iconFilepath*: cstring
     tooltip*: cstring
+    tooltipCmd*: cstring
     cb*: proc (tray: ptr Tray) {.cdecl.}
     menu*: ptr UncheckedArray[TrayMenuItem] # array
 
@@ -82,6 +83,7 @@ proc setSubMenus*(trayItem: var TrayMenuItem, menus: openArray[TrayMenuItem]) =
 proc initTray*(
   iconFilepath: string = "",
   tooltip: string = "",
+  tooltipCmd: string = "",
   cb: proc (tray: ptr Tray) {.cdecl.} = nil,
   menus: openArray[TrayMenuItem] = []
 ): Tray =
@@ -90,6 +92,7 @@ proc initTray*(
   result = Tray(
     iconFilepath: cstring iconFilepath,
     tooltip: cstring tooltip,
+    tooltipCmd: cstring tooltipCmd,
     cb: cb
   )
 
@@ -119,7 +122,7 @@ proc trayGetInstance*(): ptr Tray {.cdecl, importc: "tray_get_instance", traypro
   ## Returns the tray instance.
 proc trayInit*(tray: ptr Tray): cint {.cdecl, importc: "tray_init", trayproc.}
   ## Creates tray icon. Returns `-1` if tray icon/menu can't be created.
-proc trayLoop*(blocking: cint): cint {.cdecl, importc: "tray_loop", trayproc.}
+proc trayLoop*(blocking: cint, tray: ptr Tray): cint {.cdecl, importc: "tray_loop", trayproc.}
   ## Runs one iteration of the UI loop. Returns `-1` if `trayExit()`_ has been called.
 proc trayUpdate*(tray: ptr Tray) {.cdecl, importc: "tray_update", trayproc.}
   ## Updates tray icon and menu.
